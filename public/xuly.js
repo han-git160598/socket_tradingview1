@@ -1,5 +1,5 @@
 
-var socket = io('http://192.168.100.16:3000/');
+var socket = io('http://192.168.100.22:3000/');
 
 $(document).ready(function() {
     const a = { id_business: '1'};
@@ -8,4 +8,8 @@ $(document).ready(function() {
 });
 socket.on('toa-do',function (params) {
     console.log(params);
+});
+socket.on('test',function(data)
+{
+console.log(data);
 });
