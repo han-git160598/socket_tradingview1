@@ -9,7 +9,7 @@ $(document).ready(function() {
 socket.on('toa-do',function (params) {
     console.log(params);
 });
-socket.on('test',function(data)
+socket.on('block-tradeing',function(data)
 {
 console.log(data);
 });

@@ -45,39 +45,54 @@ io.on("connection", function(socket){
 
   if(dem < 2 )
   {
-    var z = TaoSoNgauNhien(30000, 70000);
+    var visits=22532;
+    // var GG = TaoSoNgauNhien(G-5000, G+5000);
     setInterval(function () {
-     
+
       //var time_start = new Date().getTime();
-      var y = TaoSoNgauNhien(10000, 90000);
-      var now_time = new Date().getTime();
-      var x = Math.floor(now_time/1000);
+      y = Math.round((visits + (Math.random() < 0.5 ? 1 : -1) * Math.random()) *1000)/1000;
+     // var y = TaoSoNgauNhien(10000, 90000);
+     // var now_time = new Date().getTime();
+      var x = Math.floor((new Date().getTime())/1000);
       var coordinate_xy = {x:x, y:y};
       var coordinate_xy_string = JSON.stringify(coordinate_xy);
-     // console.log(JSON.stringify(coordinate_xy));
-      io.sockets.emit('toa-do',coordinate_xy);
-
-      const data_round1 = { detect: 'add_coordinate',coordinate_xy:coordinate_xy_string,
+      const data_round1 = { detect: 'add_coordinate',coordinate_xy:coordinate_xy_string, time_present:x,
       session_time_open:x};
       axios.post(url, data_round1, { headers,
       }).then((res) => {
         console.log(res.data);
+        if(res.data.success == "true")
+        {
+          io.sockets.emit('diem-g',coordinate_xy);
+        }
+        
       }).catch((error) => {
       })
 
+      io.sockets.emit('toa-do',coordinate_xy);
 
       //get DB
 
-      const data_round = { detect: 'list_session_stock',time_break:1614322140};
+      const data_round = { detect: 'win_lose_trade',time_break:x};
       axios.post(url, data_round, { headers,
       }).then((res) => {
-        //console.log(res.data);
-        if(res.data.data[0].time_break == 1614322140)
-        {
+       
+    
+        if(res.data.success == "true")  
+        { 
+          if(res.data.data[0].result_trade == "UP")
+          {
+            var G = JSON.parse(res.data.data[0].coordinate_g);
+            console.log(G);
 
-          console.log('notification');
-          io.sockets.emit('block-tradeing',{'notification':'block_trading'});
+            io.sockets.emit('block-tradeing',{'notification':'block_trading'});
 
+          }else{
+
+           io.sockets.emit('block-tradeing',{'notification':'block_trading'});
+          
+          }
+          
         }
 
       }).catch((error) => {
