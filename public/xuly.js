@@ -8,6 +8,7 @@ $(document).ready(function() {
 });
 socket.on('toa-do',function (params) {
     console.log(params);
+    console.log(params.y);
 });
 socket.on('block-tradeing',function(data)
 {
