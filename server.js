@@ -22,7 +22,7 @@ const io = require('socket.io')(server, {
 //   database: "your_database"
 // })
 
-server.listen(process.env.PORT || 3000 );
+server.listen(process.env.PORT || 3001 );
 
 // con.connect(function(err) {
 //   if (err) throw err;

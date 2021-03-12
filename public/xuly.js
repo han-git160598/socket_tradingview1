@@ -1,5 +1,5 @@
 
-var socket = io('https://socketksetrading.herokuapp.com/');
+var socket = io('http://192.168.100.16:3001/');
 socket.on('toa-do',function (params) {
     console.log(params);
 });
