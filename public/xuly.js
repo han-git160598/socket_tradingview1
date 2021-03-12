@@ -1,16 +1,16 @@
 
-var socket = io('http://192.168.100.22:3000/');
-
-$(document).ready(function() {
-    const a = { id_business: '1'};
-   socket.emit('join-store',a);
-  
-});
+var socket = io('https://socketksetrading.herokuapp.com/');
 socket.on('toa-do',function (params) {
     console.log(params);
-    console.log(params.y);
 });
-socket.on('block-tradeing',function(data)
+socket.on('coordinates_real',function (params) {
+    console.log(params);
+});
+socket.on('block-trading',function(data)
+{
+console.log(data);
+});
+socket.on('check-result',function(data)
 {
 console.log(data);
 });

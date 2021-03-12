@@ -29,11 +29,12 @@ server.listen(process.env.PORT || 3000 );
 //   console.log("Connected!!!")
 // });
 
-const url = 'http://192.168.100.29/trading_view/api/'
+const url = 'http://diendengiadung.com/api/'
 const headers = { 'Authorization': 'Basic YWRtaW46cXRjdGVrQDEyMwx==' }
 
 var dem = 0;
 io.on("connection", function(socket){ 
+  io.sockets.emit('ket-noi','chi Dieemx vo');
   dem++;
   console.log("có người kết nối");  
   console.log(dem);
@@ -52,11 +53,20 @@ io.on("connection", function(socket){
       var x = Math.floor((new Date().getTime())/1000);
       var xy = {x:x, y:y};
       var coordinate_xy = JSON.stringify(xy);
+
+      const auto_create = { detect: 'auto_creat_session',stock_time_close:x};
+      axios.post(url, auto_create, { headers,
+      }).then((res) => {
+        
+        // if(res.data.data[0].message == '')
+      }).catch((error) => {
+      })
       
       const data_round1 = { detect: 'check_time_block',session_time_break:x };
       axios.post(url, data_round1, { headers,
       }).then((res) => {
-           
+       
+        
         if(res.data.data[0].status_trade == 'trading')
         {
           console.log('trading');
@@ -64,36 +74,43 @@ io.on("connection", function(socket){
           session_time_open:x};
           axios.post(url, data_add_coordinate, { headers,
           }).then((res) => {
-            
-            io.sockets.emit('toa-do',coordinate_xy);
 
+          //  console.log(res.data.data[0].coordinate_g);
+            io.sockets.emit('coordinates_real',coordinate_xy);
+            io.sockets.emit('diem-g',res.data.data[0].coordinate_g);
+            io.sockets.emit('block-trading', {notification:'unlock_trading'});
+ 
           }).catch((error) => {
           })
         }
-        else
+        if(res.data.data[0].status_trade == 'block')
         {
           console.log('block');
           const data_round = { detect: 'win_lose_trade',time_break:x};
           axios.post(url, data_round, { headers,
           }).then((res) => {
-
+           
             if(res.data.data[0].result_trade == "up")
             {
               console.log('up');
+              var a =  parseInt(res.data.data[0].time_close);
+              var b = Math.floor((new Date().getTime())/1000);
+             
               if(parseInt(res.data.data[0].time_close) ==  Math.floor((new Date().getTime())/1000))
               {
                 console.log('finish');
                 var G = JSON.parse(res.data.data[0].coordinate_g);
-                y = Math.round((TaoSoNgauNhien(G.y+0.1, G.y+0.9)) * 1000) / 1000;
+                y = TaoSoNgauNhien(G.y+0.1, G.y+0.9);
                 coordinate_xy = JSON.stringify({x:x, y:y}); 
                 const data_add_coordinate = { detect: 'add_coordinate',coordinate_xy:coordinate_xy, time_present:x,
                 session_time_open:x};
                 axios.post(url, data_add_coordinate, { headers,
                 }).then((res) => {
-                    io.sockets.emit('toa-do',coordinate_xy);
+                    io.sockets.emit('coordinates_real',coordinate_xy);
+                    io.sockets.emit('check-result',{reload_money:'reload_money'});
+                    io.sockets.emit('block-trading', {notification:'block_trading'});
                 }).catch((error) => {
                 })
-
               }else{
                 console.log('break');
                 var G = JSON.parse(res.data.data[0].coordinate_g);
@@ -103,16 +120,47 @@ io.on("connection", function(socket){
                 session_time_open:x};
                 axios.post(url, data_add_coordinate, { headers,
                 }).then((res) => {
-                    io.sockets.emit('toa-do',coordinate_xy);
+                    io.sockets.emit('coordinates_real',coordinate_xy);
+                    io.sockets.emit('block-trading', {notification:'block_trading'});
                 }).catch((error) => {
                 })
               }
-              
             }else{
               console.log('down');
+              var a =  parseInt(res.data.data[0].time_close);
+              var b = Math.floor((new Date().getTime())/1000);
+             
+              if(parseInt(res.data.data[0].time_close) ==  Math.floor((new Date().getTime())/1000))
+              {
+                console.log('finish');
+                var G = JSON.parse(res.data.data[0].coordinate_g);
+                y = TaoSoNgauNhien(G.y-0.1, G.y-0.9);
+                coordinate_xy = JSON.stringify({x:x, y:y}); 
+                const data_add_coordinate = { detect: 'add_coordinate',coordinate_xy:coordinate_xy, time_present:x,
+                session_time_open:x};
+                axios.post(url, data_add_coordinate, { headers,
+                }).then((res) => {
+                    io.sockets.emit('coordinates_real',coordinate_xy);
+                    io.sockets.emit('check-result',{reload_money:'reload_money'});
+                    io.sockets.emit('block-trading', {notification:'block_trading'});
+                }).catch((error) => {
+                })
+              }else{
+                console.log('break');
+                var G = JSON.parse(res.data.data[0].coordinate_g);
+                y = Math.round((TaoSoNgauNhien(G.y-0.3, G.y+0.5)) * 1000) / 1000;
+                coordinate_xy = JSON.stringify({x:x, y:y}); 
+                const data_add_coordinate = { detect: 'add_coordinate',coordinate_xy:coordinate_xy, time_present:x,
+                session_time_open:x};
+                axios.post(url, data_add_coordinate, { headers,
+                }).then((res) => {
+                    io.sockets.emit('coordinates_real',coordinate_xy);
+                    io.sockets.emit('block-trading', {notification:'block_trading'});
+                }).catch((error) => {
+                })
+              }
+
             }
-
-
           }).catch((error) => {
           }) 
           
@@ -123,7 +171,7 @@ io.on("connection", function(socket){
       })
 
 //// nói phi trả về 1 cái json thông báo tơi time break
-
+////socket yêu cầu hỗ trợ
 
 
 
