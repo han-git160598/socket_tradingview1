@@ -10,8 +10,9 @@ app.set("views", "./views");
 
 var server = require("http").Server(app);
 const io = require('socket.io')(server, {
+  
     cors: {
-      origin: '*',  
+      origin: '*',
     }
   });
 
@@ -22,29 +23,24 @@ const io = require('socket.io')(server, {
 //   database: "your_database"
 // })
 
-server.listen(process.env.PORT || 3001 );
+server.listen(process.env.PORT || 3000 );
 
 // con.connect(function(err) {
 //   if (err) throw err;
 //   console.log("Connected!!!")
 // });
 
-const url = 'http://diendengiadung.com/api/'
+const url = '192.168.100.21'
 const headers = { 'Authorization': 'Basic YWRtaW46cXRjdGVrQDEyMwx==' }
-
+function TaoSoNgauNhien(min, max) {
+  return Math.random() * (max - min) + min;
+}
+function random_y(number)
+{
+  return Math.round((number + (Math.random() < 0.5 ? 1 : -1) * Math.random()) *1000)/1000;
+}
 var dem = 0;
-io.on("connection", function(socket){ 
-  io.sockets.emit('ket-noi','chi Dieemx vo');
-  dem++;
-  console.log("có người kết nối");  
-  console.log(dem);
-  function TaoSoNgauNhien(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-  function random_y(number)
-  {
-    return Math.round((number + (Math.random() < 0.5 ? 1 : -1) * Math.random()) *1000)/1000;
-  }
+io.on("connection", function(socket){   
   if(dem < 2 )
   {
       var visits=10;
@@ -76,10 +72,10 @@ io.on("connection", function(socket){
           }).then((res) => {
 
           //  console.log(res.data.data[0].coordinate_g);
-            io.sockets.emit('coordinates_real',coordinate_xy);
-            io.sockets.emit('diem-g',res.data.data[0].coordinate_g);
-            io.sockets.emit('block-trading', {notification:'unlock_trading'});
- 
+              io.sockets.emit('coordinates_real',coordinate_xy);
+              io.sockets.emit('diem-g',res.data.data[0].coordinate_g);
+              io.sockets.emit('block-trading', {notification:'unlock_trading'});
+  
           }).catch((error) => {
           })
         }
@@ -305,6 +301,10 @@ io.on("connection", function(socket){
 
     
   // });
+  socket.on('disconnect', (reason) => {
+    console.log(reason);
+    socket.emit('disconnect-socket',reason);
+  });
 
 });
 
