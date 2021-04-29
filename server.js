@@ -23,7 +23,7 @@ server.listen(process.env.PORT || 5000);
 
 
 
-const url = 'http://diendengiadung.com/api/';
+//const url = 'http://diendengiadung.com/api/';
 //const url = 'http://192.168.100.22/kse_trade/api/' // locals
 const headers = { 'Authorization': 'Basic YWRtaW46cXRjdGVrQDEyMwx==' }
 io.on("connection", function(socket) {
